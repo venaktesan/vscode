@@ -1,0 +1,5 @@
+projectKey=silverbulleters.sonarqube-inject
+serverUrl=http://localhost:9000
+dashboardUrl=http://localhost:9000/dashboard/index/silverbulleters.sonarqube-inject
+ceTaskId=AVuQlpxZBP6LvgX3oSRz
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AVuQlpxZBP6LvgX3oSRz
