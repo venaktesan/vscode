@@ -39,7 +39,7 @@ const statusBar_Blocker=vscode.window.createStatusBarItem(vscode.StatusBarAlignm
 const statusBar_All=vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
 const statusBar_Info=vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
 const processBar_Info=vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-const processBar_Info1=vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left,1);
+
 
 let sonarCriticalArray = [];
 let sonarMajorArray = [];
@@ -72,12 +72,9 @@ updateSonarLintRules(){
     host: '192.168.1.55',
     username: 'johnsonp',
     password: 'Welcome321'  
-    },function(error) {
-    console.log("Something's wrong in ssh connection")
-    vscode.window.showErrorMessage("Something's wrong in updateSonarLintRules =>" +error);
     }).then(function() {
-      sshConnectFlag=1;
-       // Local, Remote 
+    sshConnectFlag=1;
+    // Local, Remote 
     ssh.getFile(pathTo_RulesOverWritePath+'\\.csslintrc', '/opt/sonar-web-frontend-reporters-master/rules/.csslintrc').then(function(Contents) {
         console.log("The .csslintrc File's contents were successfully downloaded");
     }, function(error) {
@@ -115,10 +112,17 @@ updateSonarLintRules(){
   
     ssh.getFile(pathTo_RulesOverWritePath+'\\.sass-lint.yml', '/opt/sonar-web-frontend-reporters-master/rules/.sass-lint.yml').then(function(Contents) {
         console.log("The .sass-lint.yml File's contents were successfully downloaded");
-        processBar_Info.hide();
     }, function(error) {
         console.log("Something's wrong in .sass-lint.yml")
         vscode.window.showErrorMessage("Something's wrong in updateSonarLintRules =>.sass-lint.yml");
+    }),
+  
+    ssh.getFile(pathTo_RulesOverWritePath+'\\tslint.json', '/opt/sonar-web-frontend-reporters-master/rules/tslint.json').then(function(Contents) {
+        console.log("The tslint.json File's contents were successfully downloaded");
+        processBar_Info.hide();
+    }, function(error) {
+        console.log("Something's wrong in tslint.json")
+        vscode.window.showErrorMessage("Something's wrong in updateSonarLintRules =>tslint.json");
         processBar_Info.hide();
     });
 });
@@ -134,10 +138,15 @@ this.resetVariable();
 
 generate_Current_File_Report(){
     try{
+		
+	if (!fs.existsSync(pathToSreporterFileExist)) {
+        vscode.window.showErrorMessage('SonarFrontendFilenot exists...');
+        return;
+	}
     let activeTextEditor=vscode.window.activeTextEditor;
     console.log(activeTextEditor);
     if( activeTextEditor.document.isUntitled ){
-      vscode.window.showErrorMessage("generate_Current_File_Report: Single File Open Or New Untitled file");
+      vscode.window.showErrorMessage("generate_Current_File_Report:  This Untitled file is not analysis");
     }
     else {
     fileExtType="";
@@ -149,7 +158,7 @@ generate_Current_File_Report(){
     fileExtType=filePath.slice((filePath.lastIndexOf(".") - 1 >>> 0) + 2).toLowerCase();
 
     if(fileExtType === ""){
-    vscode.window.showErrorMessage("generate_Current_File_Report: File Extension Not Return.");    
+    vscode.window.showErrorMessage("generate_Current_File_Report: Filetype Extension is Empty...");    
         return;
     }
 
@@ -222,9 +231,9 @@ generate_Current_File_Report(){
 writeSreporterConfigFile(sreportersTemplate){
 var json = JSON.stringify(sreportersTemplate);
 fs.writeFile(pathTo_Sreporter_FileExist, json,function (err) {
-    if (err) {
-    return console.log("Error writing file: " + err);
-}
+	if (err) {
+	return console.log("Error writing file: " + err);
+	}
 console.log("file saved");
 //vscode.window.showInformationMessage("Successfully .sreporters file was created.");
 return true;
@@ -455,8 +464,8 @@ sreportersFileGenerator(){
 try{
 fileExtType="";
 if (!fs.existsSync(pathToSreporterFileExist)) {
-        vscode.window.showErrorMessage('SonarFrontendFilenot exists...');
-        return;
+	vscode.window.showErrorMessage('SonarFrontendFilenot exists...');
+	return;
 }
 const configuration = vscode.workspace.getConfiguration("sonarqube-inject");
 lintExcludePaths = configuration.get("lintexclude");
@@ -909,15 +918,4 @@ function pushReportCategorywise(categoryText,fileUri,diagnosticObject){
     }else if(categoryText === "INFO"){
      sonarInfoArray.push([fileUri, [diagnosticObject]]);
     }
-}
-
-
-function sleep(milliseconds) {
-var start = new Date().getTime();
-  for (var i = 0; i < 1e7; i++) {
-    if ((new Date().getTime() - start) > 10000){
-      break;
-    }
-  }
-  vscode.window.showInformationMessage("Is 10000");
 }
