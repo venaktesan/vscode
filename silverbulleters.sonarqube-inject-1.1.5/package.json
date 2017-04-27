@@ -227,7 +227,7 @@
           "description": "Only exclude files Path only.This exclude path are apply for sonarlint report generate not for sonarqube",
           "type": "string",
           "default": [
-            "d:\\gitproject\\app\\assert\\vendor\\**"
+            "c:\\Users\\venkatesang\\Desktop\\app\\assert\\vendor\\**","c:\\Users\\venkatesang\\Desktop\\app\\assert\\vendor\\**"
           ]
         }
       }

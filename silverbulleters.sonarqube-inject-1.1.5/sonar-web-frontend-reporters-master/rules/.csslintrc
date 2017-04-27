@@ -28,5 +28,6 @@
     "universal-selector": true,
     "unqualified-attributes": true,
     "vendor-prefix": true,
-    "zero-units": true
+    "zero-units": true,
+	"bulletproof-font-face": true
 }
